@@ -1,0 +1,20 @@
+module.exports = {
+  '01d': '<span class="iconify" data-icon="wi:day-sunny" data-inline="false"></span>', // day clear sky
+  '01n': '<span class="iconify" data-icon="wi:night-clear" data-inline="false"></span>', // night clear sky
+  '02d': '<span class="iconify" data-icon="wi:day-cloudy" data-inline="false"></span>', // day few clouds
+  '02n': '<span class="iconify" data-icon="wi:night-alt-cloudy" data-inline="false"></span>', // night few clouds
+  '03d': '<span class="iconify" data-icon="wi:cloud" data-inline="false"></span>', // day scattered clouds
+  '03n': '<span class="iconify" data-icon="wi:cloud" data-inline="false"></span>', // night scattered clouds
+  '04d': '<span class="iconify" data-icon="wi:cloudy" data-inline="false"></span>', // day broken clouds
+  '04n': '<span class="iconify" data-icon="wi:cloudy" data-inline="false"></span>', // night broken clouds
+  '09d': '<span class="iconify" data-icon="wi:showers" data-inline="false"></span>', // day shower rain
+  '09n': '<span class="iconify" data-icon="wi:showers" data-inline="false"></span>', // night shower rain
+  '10d': '<span class="iconify" data-icon="wi:rain" data-inline="false"></span>', // day rain
+  '10n': '<span class="iconify" data-icon="wi:rain" data-inline="false"></span>', // night rain
+  '11d': '<span class="iconify" data-icon="wi:storm-showers" data-inline="false"></span>', // day thunderstorm
+  '11n': '<span class="iconify" data-icon="wi:storm-showers" data-inline="false"></span>', // night thunderstorm
+  '13d': '<span class="iconify" data-icon="wi:snow" data-inline="false"></span>', // day snow
+  '13n': '<span class="iconify" data-icon="wi:snow" data-inline="false"></span>', // night snow
+  '50d': '<span class="iconify" data-icon="wi:sleet" data-inline="false"></span>', // day mist
+  '50n': '<span class="iconify" data-icon="wi:sleet" data-inline="false"></span>' // night mist
+}

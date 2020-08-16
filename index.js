@@ -1,149 +1,147 @@
+const console = require('../../server/logger.js')('WEATHER')
+const iconmap = require('./iconmap.js')
 const { ComponentClass } = require('../../server/component-helper.js')
-// You might need ComponentHelper also.
-// const { ComponentClass, ComponentHelper } = require('../../server/component-helper.js')
+const fetch = require('node-fetch')
 
-/**
- * Extended class to be exported as `Component`
- *
- * @class
- * @external ComponentClass
- * @exports Anonymousclass
- */
+// const { DateTime } = require('luxon')
+
 module.exports = class extends ComponentClass {
-  /**
-   * This callback will be called when this component object is constructed and loaded into server.
-   *
-   * @description Usually, a good position to initialize internal values.
-   * `this.config` and `this.elements` are fulfilled already from `./config.js`
-   * And some basic read-only properties `this.id`, `this.name`, `this.dir`, `this.url` are defined.
-   *
-   * @returns null
-   */
-  onConstructed () {
-    // code
-  }
-
-  /**
-   * This callback will be called each time when a client is connected and ready.
-   *
-   * @description If you need client-specific job, you can start here.
-   * @param {string} clientId - client id (e.g: `default_123456789`)
-   * @returns {Promise} `resolve()` or `reject(reason)`
-   */
-  onClientReady (clientId) {
-    return new Promise((resolve, reject) => {
-      // code
-      resolve()
-    })
-  }
-
-  /**
-   * Message from the client (client scripts or custom elements)
-   *
-   * @param {object} - Message object
-   * @returns {anything | null} return value will be returned to sender of message automatically.
-   */
-  onClientMessage (message) {
-    console.log(message)
-    console.log(`Component ${this.id} is received message from client.`)
-    return 'SUCCESS'
-  }
-
-  /**
-   * This callback will be called when all server assets are loaded and prepared.
-   *
-   * @description Usually, a good position to start serverside works.
-   * @returns null
-   */
-  onReady () {
-    // code
-  }
-
-  /**
-   * This callback will be called when HTTP Request is comming to this component.
-   *
-   * @description By default, `/COMPONENT_ID` URL is opened for getting HTTP Request from outside.
-   * Usable to make mini web service or REST API service of this component.
-   * @param {object} req - Express.request
-   * @param {object} res - Express.response
-   * @returns null
-   * @example
-   * onRequested (req, res) {
-   *    res.status(404).send('No response.')
-   * }
-   */
-  onRequested (req, res) {
-    res.status(404).send('No response.')
-  }
-
-  /**
-   * Inject Internal/External javascript to client document
-   *
-   * @description When you need `<script src=...>` in document of client.
-   * Tbis method will be ignored if the user might override `_scripts: []` in `./config.js`
-   *
-   * @returns {array} Array of URL
-   * @example
-   * return [
-   * '/THISCOMPONENT/public/some.js',
-   * 'https://somewhere/some.js'
-   * ]
-   */
-  injectScripts () {
-    return []
-  }
-
-  /**
-   * Inject Internal/External CSS Stylesheet to client document
-   *
-   * @description When you need `<link type="text/css" ...>` in document of client.
-   * Tbis method will be ignored if the user might override `_styles: []` in `./config.js`
-   *
-   * @returns {array} Array of URL
-   * @example
-   * return [
-   * '/THISCOMPONENT/public/some.css',
-   * 'https://somewhere/some.css'
-   * ]
-   */
   injectStyles () {
-    return []
+    return [
+      '/weather/public/weather.css'
+    ]
   }
 
-  /**
-   * Inject Internal/External Module script(ES2015, mjs) to client document.
-   *
-   * @description When you need `import ...` in document of client.
-   * imported module will be attached to the global `window.MZ` object.
-   * So you can use that imported module in anywhere of client. (Usually in `customElement`)
-   * Tbis method will be ignored if the user might override `_moduleScripts: []` in `./config.js`
-   *
-   * @returns {array} Array of URL
-   * @example
-   * return [
-   * '/THISCOMPONENT/public/some.mjs',
-   * 'https://somewhere/some.mjs'
-   * ]
-   */
-  injectModuleScripts () {
-    return []
+  onConstructed () {
+    var uid = 1
+    this.timer = null
+    this.locations = []
+    this.weathers = {}
+    if (!this.config.locations || !Array.isArray(this.config.locations) || this.config.locations.length < 1) {
+      console.warn('Invalid configuration of locations. Confirm your config.')
+      return
+    }
+    for (const location of this.config.locations) {
+      if (!location.title) location.title = 'NONAME_' + uid++
+      if (!location.id) location.id = location.title.replace(/[^a-zA-Z0-9]/g, '_')
+      if (!location.language) location.language = this.config.language || Intl.DateTimeFormat().resolvedOptions().locale || 'en'
+      if (!location.unit) location.unit = this.config.unit || 'metric'
+      if (!location.key) location.key = this.config.key || null
+      if (!location.lattitude || !location.longitude || !location.key) {
+        console.warn(`Invalid configuration of location: ${location.title}. It will be ignored.`)
+        return
+      }
+      this.locations.push(location)
+    }
   }
 
-  /**
-   * Add static routes to express webserver.
-   *
-   * @returns {array} array of string(route) or array of object(route, path)
-   * @example
-   * return [
-   *   'resource', // /COMPONENT_ID/resource will be served as http://localhost:8080/COMPONENT_ID/resource
-   *   {
-   *      'path': 'some/path/to' // /COMPONENT_ID/some/path/to will be served as;
-   *      'route': '/images', // http://localhost:8080/images
-   *   }
-   * ]
-   *
-   */
-  getStaticRoutes () {
-    return []
+  onStart () {
+    this.onResume()
+  }
+
+  onClientReady (clientUID, clientName) {
+    this.transportData(`CLIENT(UID:${clientUID})`, 'WEATHER_ICONS', iconmap)
+  }
+
+  onResume () {
+    const scanInterval = this.config.scanInterval || 1000 * 60 * 30
+    clearTimeout(this.timer)
+    this.scan()
+    this.timer = setTimeout(() => {
+      this.onResume()
+    }, scanInterval)
+  }
+
+  onSuspend () {
+    clearTimeout(this.timer)
+  }
+
+  onMessage (msgObj, reply) {
+    if (msgObj.message === 'REQUEST_WEATHER') {
+      reply(this.pickWeather(msgObj.locations))
+    }
+  }
+
+  pickWeather (locations = '') {
+    var loc = locations.split(/[ ,]+/).filter(Boolean)
+    var keys = Object.keys(this.weathers)
+    var is = []
+    if (Array.isArray(loc) && loc.length > 0) {
+      is = loc.filter((value) => { return keys.includes(value) })
+    } else {
+      is = keys
+    }
+    var weathers = []
+    for (var c of is) {
+      weathers.push(this.weathers[c])
+    }
+    return weathers
+  }
+
+  scan () {
+    for (const location of this.locations) {
+      const {
+        title,
+        id,
+        language,
+        unit,
+        key,
+        lattitude,
+        longitude
+      } = location
+      const api = `https://api.openweathermap.org/data/2.5/onecall?lat=${lattitude}&lon=${longitude}&exclude=minutely&lang=${language}&units=${unit}&appid=${key}`
+      fetch(api).then(res => res.json()).then((json) => {
+        console.info('Getting weather information from openweathermap:', title)
+        const meta = {
+          id: id,
+          title: title,
+          language: language,
+          unit: unit,
+          lattitude: json.lat,
+          longitude: json.lon,
+          timezone: json.timezone,
+          timezone_offset: json.timezone_offset
+        }
+        delete json.lat
+        delete json.lon
+        delete json.timezone
+        delete json.timezone_offset
+        this.weathers[id] = this.refine(json, meta)
+      }).catch((e) => {
+        console.warn('There is something wrong ')
+        console.error(e)
+      })
+    }
+  }
+
+  refine (json, meta) {
+    var {
+      current,
+      hourly,
+      daily
+    } = json
+    var today = null
+    if (daily['0']) {
+      today = daily['0']
+      /*
+      if (today.weather && Array.isArray(today.weather)) {
+        today.weather = today.weather[0]
+      }
+      */
+    }
+    /*
+    if (current.weather && Array.isArray(current.weather)) {
+      current.weather = current.weather[0]
+    }
+    */
+    json = {
+      meta,
+      current,
+      today,
+      hourly,
+      daily
+    }
+
+    return json
   }
 }
