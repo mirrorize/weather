@@ -58,7 +58,6 @@ export default class extends CustomElement {
     section = flattenObject(section)
     var type = this.getAttribute('type') || 'text'
     var timeFormat = this.getAttribute('timeformat') || this.default[sectionName] || 'h a'
-    console.log(sectionName, timeFormat)
     var fixup = this.getAttribute('fixup') || 0
 
     var aPart = this.getAttribute('part')
