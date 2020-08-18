@@ -28,12 +28,6 @@ module.exports = class extends ComponentClass {
     }
   }
 
-  injectStyles () {
-    return [
-      '/weather/public/weather.css'
-    ]
-  }
-
   onConstructed () {
     var uid = 1
     this.timer = null

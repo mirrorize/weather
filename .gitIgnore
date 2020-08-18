@@ -1,5 +1,6 @@
 # user custom
 config.js
+iconmap.js
 
 # Dependency directories
 node_modules/
