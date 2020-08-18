@@ -6,6 +6,28 @@ const fetch = require('node-fetch')
 // const { DateTime } = require('luxon')
 
 module.exports = class extends ComponentClass {
+  defaultConfig () {
+    return {
+      key: '505969b343..........d4033c4f71', // https://home.openweathermap.org/api_keys
+      unit: 'metric', // Or 'imperial'
+      language: 'en', // https://openweathermap.org/api/one-call-api#multi
+      queryInterval: 1000 * 60 * 30,
+      // Free plan of openweathermap has quota limit (1000 per daily).
+      // (38600000 / queryInterval) * number of locations will be your daily consumption of API.
+      // I believe 1000 * 60 * 30 (30 minutes) is quite enough.
+
+      locations: [
+        {
+          title: 'Kriftel',
+          lattitude: 50.08408,
+          longitude: 8.46977,
+          language: 'de' // If you want to apply another language for this location.
+          // key: 'xxxx....', // If you want to apply another apiKey for this query.
+        },
+      ]
+    }
+  }
+
   injectStyles () {
     return [
       '/weather/public/weather.css'

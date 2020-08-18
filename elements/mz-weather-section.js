@@ -5,122 +5,72 @@ const defaultTemplate = `
 <style>
 :host {
   display: block;
+  box-sizing: border-box;
+  color: var(--font-color-second, #CCC);
+  --default-font-size: var(--font-base-size, 20px);
+  font-size: var(--default-font-size, 20px);
+  padding-bottom: 5px;
 }
 
-#mainContainer {
-  font-size: var(--base-font-size, 15px);
-  color: var(--font-color-second, #BBB);
-  font-weight: bolder;
-}
-.container {
-  padding: 5px;
-  width: 100%;
+:host([section=today]) {
+  --default-font-size: calc(var(--font-base-size, 20px) * 0.8);
 }
 
-.con_hourly {
+:host([section=hourly]) {
+  --default-font-size: calc(var(--font-base-size, 20px) * 0.8);
   display: flex;
-  overflow: hidden;
-  align-items: stretch;
+  flex-direction: row;
+  justify-content: space-between;
 }
 
-.hor {
-  display:flex;
+:host([section=daily]) {
+  --default-font-size: calc(var(--font-base-size, 20px) * 0.8);
 }
 
-.hor > * {
-  flex: 1 1 auto;
-  text-align: center;
+* {
+  box-sizing: border-box;
 }
 
-.hor_item {
-  flex: 1 1 auto;
-  max-width: 20%;
+.container {
+  display: flex;
+  justify-content: space-around;
 }
 
 .ver {
-  display:flex;
   flex-direction: column;
 }
 
-.current {
-  font-size: 60%;
+.hor {
+  flex-direction: row;
 }
 
-.current mz-weather-parts[part=title] {
-  text-align: center;
-  font-weight: bolder;
-  color: var(--font-color-first, white);
-}
-
-.current mz-weather-parts[part=dt] {
-  text-align: center;
-  font-size: 75%;
-
-}
-
-.current .emp {
-  margin-righ: 20px;
-}
-
-.current .emp .hor {
+.center {
   justify-content: center;
-}
-
-.current .emp > * {
-  font-size: 500%;
-  font-weight: bolder;
+  align-items: center;
   text-align: center;
-  color: white;
-  width: auto;
-  padding: 10px;
-  flex-grow: none;
-  flex-shring: none;
 }
 
-.today {
-  font-size:75%;
+.title_section {
+  font-size: 1em;
+  align-items: center;
+
 }
 
-.hourly mz-weather-parts {
-  text-align: center;
-  font-size: 70%;
-  height:100%;
+.title_section [part=title] {
+  font-weight:bolder;
+}
+
+.title_section [part=dt] {
+  font-size: 0.8em;
+}
+
+.emp {
+  font-size: 3em;
   font-weight: bold;
-}
-.hourly mz-weather-parts[part=dt],
-.hourly mz-weather-parts[part=weather.icon] {
-
-}
-.hourly mz-weather-parts[part=dt] {
-  font-size: 50%;
-  text-align: center;
-}
-
-.daily mz-weather-parts {
-  font-size: 70%;
-  text-align: left;
-}
-.daily mz-weather-parts[part=dt] {
-  width: 35%;
-}
-
-.daily mz-weather-parts[part="weather.icon"] {
-  text-align: center;
-  width: 15%;
-}
-.daily mz-weather-parts[part=pop] {
-  width: 15%;
-  color: #1BE;
-  text-align: center;
-}
-.daily mz-weather-parts[part="temp.min"] {
-  width: 15%;
-  text-align: right;
-}
-
-.daily mz-weather-parts[part="temp.max"] {
-  width: 15%;
-  text-align: right;
+  margin-top: 0.5em;
+  justify-content: space-around;
+  color: var(--font-color-first, white);
+  line-height: 100%;
 }
 
 .temp_min {
@@ -128,60 +78,106 @@ const defaultTemplate = `
 }
 
 .temp_max {
-  color: #FC2
+  color: #FC2;
 }
 
+.hourly_iteration {
+  align-items: center;
+  justify-content: center;
+}
 
+.hourly_iteration [part=temp] {
+  font-weight: bolder;
+}
 
+.hourly_iteration [part="weather.icon"] {
+  font-size: 1.5em;
+  font-weight: bolder;
+}
+
+.daily_iteration [part=dt] {
+  width: 35%;
+}
+
+.daily_iteration [part="weather.icon"] {
+  width: 10%;
+  text-align: center;
+  font-weight: bolder;
+}
+.daily_iteration [part=pop] {
+  width: 15%;
+  text-align: right;
+  color: #33F;
+}
+.daily_iteration [part="temp.min"] {
+  width: 15%;
+  text-align: right;
+}
+.daily_iteration [part="temp.max"] {
+  width: 15%;
+  text-align: right;
+}
 
 </style>
-<div id="mainContainer"></div>
-<template id="weather_current">
-  <div class="container current">
-    <div><mz-weather-parts part="title" type="text"></mz-weather-parts></div>
-    <div><mz-weather-parts part="dt" type="time"></mz-weather-parts></div>
-    <div class="emp hor">
-      <mz-weather-parts part="weather.icon" type="icon"></mz-weather-parts>
-      <mz-weather-parts part="temp" type="temperature" fixup="0"></mz-weather-parts>
-    </div>
-    <div>
-      <mz-weather-parts part="weather.description" type="text"></mz-weather-parts>
-    </div>
+
+<template id="current">
+  <div class="container ver center title_section">
+    <mz-weather-part part="title" type="text"></mz-weather-part>
+    <mz-weather-part part="dt" type="time"></mz-weather-part>
+  </div>
+  <div class="container emp hor center">
+    <mz-weather-part part="weather.icon" type="icon"></mz-weather-part>
+    <mz-weather-part part="temp" type="temperature" fixup="0" displayunit></mz-weather-part>
+  </div>
+  <div class="container center">
+    <mz-weather-part part="weather.description" type="text"></mz-weather-part>
   </div>
 </template>
-<template id="weather_today">
-  <div class="container today hor">
-    <mz-weather-parts part="temp.min" type="temperature" class="temp_min">
+
+<template id="today">
+  <div class="container hor">
+    <mz-weather-part part="temp.min" type="temperature" class="temp_min">
       <span slot="pre" class="iconify" data-icon="wi:direction-down"></span>
-    </mz-weather-parts>
-    <mz-weather-parts part="temp.max" type="temperature" class="temp_max">
+      <span slot="post">°</span>
+    </mz-weather-part>
+    <mz-weather-part part="temp.max" type="temperature" class="temp_max">
       <span slot="pre" class="iconify" data-icon="wi:direction-up"></span>
-    </mz-weather-parts>
-    <mz-weather-parts part="sunrise" type="time" timeformat="h:m a">
+      <span slot="post">°</span>
+    </mz-weather-part>
+    <mz-weather-part part="sunrise" type="time" timeformat="h:m a">
       <span slot="pre" class="iconify" data-icon="wi:sunrise"></span>
-    </mz-weather-parts>
-    <mz-weather-parts part="sunset" type="time" timeformat="h:m a">
+    </mz-weather-part>
+    <mz-weather-part part="sunset" type="time" timeformat="h:m a">
       <span slot="pre" class="iconify" data-icon="wi:sunset"></span>
-    </mz-weather-parts>
+    </mz-weather-part>
   </div>
 </template>
-<template id="weather_hourly">
-  <div class="container hourly ver">
-      <mz-weather-parts part="temp" type="temperature"></mz-weather-parts>
-      <mz-weather-parts part="weather.icon" type="icon"></mz-weather-parts>
-      <mz-weather-parts part="dt" type="time"></mz-weather-parts>
+
+<template id="hourly">
+  <div class="container hourly_iteration ver">
+      <mz-weather-part part="temp" type="temperature">
+        <span slot="post">°</span>
+      </mz-weather-part>
+      <mz-weather-part part="weather.icon" type="icon"></mz-weather-part>
+      <mz-weather-part part="dt" type="time"></mz-weather-part>
   </div>
 </template>
-<template id="weather_daily">
-  <div class="container daily hor">
-    <mz-weather-parts part="dt" type="time" timeformat="EEEE"></mz-weather-parts>
-    <mz-weather-parts part="weather.icon" type="icon"></mz-weather-parts>
-    <mz-weather-parts part="pop" type="ratio"></mz-weather-parts>
-    <mz-weather-parts part="temp.min" type="temperature" class="temp_min"></mz-weather-parts>
-    <mz-weather-parts part="temp.max" type="temperature" class="temp_max"></mz-weather-parts>
+
+<template id="daily">
+  <div class="container daily_iteration hor">
+    <mz-weather-part part="dt" type="time" timeformat="EEEE"></mz-weather-part>
+    <mz-weather-part part="weather.icon" type="icon"></mz-weather-part>
+    <mz-weather-part part="pop" type="ratio" displayunit></mz-weather-part>
+    <mz-weather-part part="temp.min" type="temperature" class="temp_min">
+      <span slot="post">°</span>
+    </mz-weather-part>
+    <mz-weather-part part="temp.max" type="temperature" class="temp_max">
+      <span slot="post">°</span>
+    </mz-weather-part>
   </div>
 </template>
 `
+
 
 export default class extends CustomElement {
   get isShadow () {
@@ -205,12 +201,12 @@ export default class extends CustomElement {
   }
 
   draw (weather, section, template) {
-    var container = this.contentDom.querySelector('#mainContainer')
-    if (!container) {
-      console.warn('mz-weather-section needs #mainContainer in the template.')
+    var nodes = this.contentDom.children
+    for (var d of [...nodes]) {
+      if (d.nodeName !== 'STYLE' && d.nodeName !== 'TEMPLATE') {
+        d.remove()
+      }
     }
-    container.innerHTML = ''
-    container.classList.add('con_' + section)
     var max = (section === 'hourly') ? 47 : 6
     var aRepeat = Number(this.getAttribute('repeat') || 6)
     var aGap = Number(this.getAttribute('gap') || 1)
@@ -229,26 +225,18 @@ export default class extends CustomElement {
         targetWeather = Object.assign({}, weather.meta, weather[section])
       }
       var context = template.content.cloneNode(true)
-      var nodes = context.querySelectorAll('mz-weather-parts')
-      container.append(context)
+      var nodes = context.querySelectorAll('mz-weather-part')
+      this.contentDom.append(context)
       for (var n of [...nodes]) {
         if (MZ.applyIcon) MZ.applyIcon(n)
         n.setAttribute('_iterate', index)
         n.update(targetWeather, section, index)
       }
-
       index = index + aGap
       count++
     }
   }
 
-  getContainer () {
-    var container = this.contentDom.querySelector('#mainContainer')
-    if (!container) {
-      console.warn('mz-weather-section needs #mainContainer in the template.')
-    }
-    return container
-  }
 
   update (weather) {
     if (!this.getAttribute('section')) {
@@ -256,30 +244,24 @@ export default class extends CustomElement {
       return
     }
     var section = this.getAttribute('section')
-    var templateId = 'weather_' + section
-    var contentTemplate = this.contentDom.querySelector(`template#${templateId}`)
+    var contentTemplate = null
+    var aTemplateId = this.getAttribute('template')
+    if (aTemplateId) {
+      var tmpl = MZ.getTemplate(aTemplateId, false)
+      contentTemplate = tmpl
+
+    }
+    if (!contentTemplate) {
+      var templateId = section
+      var tmpl = this.contentDom.querySelector(`template#${templateId}`)
+      contentTemplate = tmpl
+    }
     if (!contentTemplate) {
       console.warn('Cannot find a proper template. Check section attribute:', section)
       return
     }
 
     this.draw(weather, section, contentTemplate)
-
-    /*
-    var childs = this.contentDom.querySelectorAll('mz-weather-parts[part]')
-    //var ret = this.flattenObject(weather[section])
-    var ret = weather([section])
-    for (var child of [...childs]) {
-      if (typeof child.update === 'function') {
-        var part = child.getAttribute('part')
-        if (!part) {
-          console.warn("'mz-weather-parts' needs 'part' attribute.")
-          continue
-        }
-        child.update(ret, section)
-      }
-    }
-    */
   }
 
   flattenObject (ob) {

@@ -59,6 +59,7 @@ export default class extends CustomElement {
     var type = this.getAttribute('type') || 'text'
     var timeFormat = this.getAttribute('timeformat') || this.default[sectionName] || 'h a'
     var fixup = this.getAttribute('fixup') || 0
+    var displayUnit = this.hasAttribute('displayunit') || false
 
     var aPart = this.getAttribute('part')
     var value = section[aPart]
@@ -80,17 +81,23 @@ export default class extends CustomElement {
         content.innerHTML = dt
         break
       case 'temperature':
-        var str = value.toFixed(fixup) + ((section.unit === 'imperial') ? '℉' : '℃')
+        var str = value.toFixed(fixup)
+        str += (displayUnit) ? (((section.unit === 'imperial') ? '℉' : '℃')) : ''
         content.innerHTML = str
         break
       case 'icon':
         content.innerHTML = icon[value]
         break
       case 'ratio':
-        if (value) content.innerHTML = (Number(value) * 100).toFixed(fixup) + '%'
+        if (value) {
+          var str = (Number(value) * 100).toFixed(fixup)
+          str += (displayUnit) ? '%' : ''
+          content.innerHTML = str
+        }
         break
       case 'speed':
-        content.innerHTML = value + ((section.unit === 'imperial') ? 'mph' : '㎧')
+        var str = value + ((displayUnit) ? ((section.unit === 'imperial') ? 'mph' : '㎧') : '')
+        content.innerHTML = str
         break
     }
   }

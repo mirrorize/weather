@@ -46,18 +46,17 @@ const defaultTemplate = `
 const defaultTemplate = `
 <style>
 :host {
-  display: block;
   position: relative;
-}
-#mainContainer {
   display:flex;
   flex-direction: column;
-  --base-font-size: calc(var(--parent-width, inherit) / 15);
-}
-.container {
-  min-width: 300px;
+  padding: 10px;
+  box-sizing: border-box;
   width: 100%;
 }
+* {
+  box-sizing: border-box;
+}
+
 .current {
   order: 1;
 }
@@ -71,23 +70,11 @@ const defaultTemplate = `
   order: 4;
 }
 
-
 </style>
-<div id="background"></div>
-<div id="mainContainer">
-  <div class="container current">
-    <mz-weather-section section="current"></mz-weather-section>
-  </div>
-  <div class="container today">
-    <mz-weather-section section="today"></mz-weather-section>
-  </div>
-  <div class="container hourly">
-    <mz-weather-section section="hourly" start="1"></mz-weather-section>
-  </div>
-  <div class="container daily">
-    <mz-weather-section section="daily" start="1"></mz-weather-section>
-  </div>
-</div>
+<mz-weather-section section="current"></mz-weather-section>
+<mz-weather-section section="today"></mz-weather-section>
+<mz-weather-section section="hourly" start="1"></mz-weather-section>
+<mz-weather-section section="daily" start="1"></mz-weather-section>
 
 `
 
@@ -104,6 +91,29 @@ export default class extends CustomElement {
     this.timer = null
     this.weathers = []
     this.index = 0
+
+    this.animation = (this.config.animation) ? this.config.animation : {
+      hide: {
+        animation: {
+          opacity: [1, 0],
+          transform: ['translateX(0%)', 'translateX(-50%)']
+        },
+        timing: {
+          duration: 1000,
+          easing: 'ease-in-out'
+        }
+      },
+      show: {
+        animation: {
+          opacity: [0, 1],
+          transform: ['translateX(50%)', 'translateX(0)']
+        },
+        timing: {
+          duration: 1000,
+          easing: 'ease-in-out'
+        }
+      }
+    }
   }
 
   onReady () {
@@ -118,7 +128,7 @@ export default class extends CustomElement {
     var bind = this.getAttribute('bind') || this.config.bind || this.bindTo
     this.sendMessage(`COMPONENT(NAME:${bind})`, {
       message: 'REQUEST_WEATHER',
-      locations: this.getAttribute('locations') || ''
+      locations: this.getAttribute('location') || ''
     }, (ret) => {
       if (!ret || !Array.isArray(ret) || ret.length < 1) {
         console.warn('Something wrong. Retrial after 60 sec.')
@@ -139,9 +149,6 @@ export default class extends CustomElement {
   }
 
   update () {
-    var parentWidth = this.parentNode.getBoundingClientRect().width
-    this.contentDom.styleSheets[0].insertRule(`:host{ --parent-width: ${parentWidth}px; }`)
-
     var refresh = this.getAttribute('refresh') || this.config.refreshInterval || 1000 * 30
     clearTimeout(this.timer)
     this.refresh()
@@ -157,16 +164,7 @@ export default class extends CustomElement {
       this.index = 0
       this.query()
     }
-    this.hide(this.uid, {
-      animation: {
-        opacity: [1, 0],
-        transform: ['translateX(0%)', 'translateX(-50%)']
-      },
-      timing: {
-        duration: 1000,
-        easing: 'ease-in-out'
-      }
-    }).then(() => {
+    this.hide(this.uid, this.animation.hide).then(() => {
       var childs = this.contentDom.querySelectorAll('mz-weather-section[section]')
       for (var child of [...childs]) {
         if (typeof child.update === 'function') {
@@ -176,16 +174,7 @@ export default class extends CustomElement {
           }
         }
       }
-      this.show(this.uid, {
-        animation: {
-          opacity: [0, 1],
-          transform: ['translateX(50%)', 'translateX(0)']
-        },
-        timing: {
-          duration: 1000,
-          easing: 'ease-in-out'
-        }
-      })
+      this.show(this.uid, this.animation.show)
     })
   }
 }

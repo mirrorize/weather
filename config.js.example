@@ -1,0 +1,36 @@
+module.exports = {
+  disabled: false,
+  config: {
+    key: 'YOUR OPENWEATHERMAP API_KEY', // https://home.openweathermap.org/api_keys
+    unit: 'metric', // Or 'imperial'
+    language: 'en', // https://openweathermap.org/api/one-call-api#multi
+    queryInterval: 1000 * 60 * 30,
+    // Free plan of openweathermap has quota limit (1000 per daily).
+    // (38600000 / queryInterval) * number of locations will be your daily consumption of API.
+    // I believe 1000 * 60 * 30 (30 minutes) is quite enough.
+
+    locations: [
+      {
+        id: 'home',
+        title: 'Home (Kriftel)',
+        lattitude: 50.08408,
+        longitude: 8.46977,
+        language: 'de' // If you want to apply another language for this location.
+        // key: 'xxxx....', // If you want to apply another apiKey for this query.
+      },
+      {
+        id: 'hq',
+        title: 'HQ Office in Seoul',
+        lattitude: 37.532600,
+        longitude: 127.024612,
+        language: 'kr'
+      },
+      {
+        title: 'Los Angeles', // Automatically id will be generated as 'Los_Angeles'
+        lattitude: 34.0522,
+        longitude: -118.2437,
+        unit: 'imperial'
+      }
+    ]
+  },
+}
