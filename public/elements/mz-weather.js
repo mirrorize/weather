@@ -1,90 +1,9 @@
 /* global CustomElement MZ */
 // const DateTime = luxon.DateTime
 
-/*
-const defaultTemplate = `
-<div class="container">
-  <mz-weather-current>
-    <div><mz-weather-parts part="title" type="text"></mz-weather-parts></div>
-    <div>!<mz-weather-parts part="dt" type="time"></mz-weather-parts></div>
-    <div><mz-weather-parts part="temp" type="temperature" fixup="0"></mz-weather-parts></div>
-    <div>
-      <mz-weather-parts part="weather_icon" type="icon"></div>
-      <mz-weather-parts part="weather_main" type="text"></div>
-    </div>
-  </mz-weather-current>
-  <mz-weather-today>
-    <div>
-      <mz-weather-parts part="temp_min" type="temperature"></mz-weather-parts>
-      <mz-weather-parts part="temp_max" type="temperature"></mz-weather-parts>
-    </div>
-    <div>
-      <mz-weather-parts part="sunrise" type="time"></mz-weather-parts>
-      <mz-weather-parts part="sunset" type="time"></mz-weather-parts>
-    </div>
-  </mz-weather-today>
-  <mz-weather-hourly>
-    <div class="container">
-      <mz-weather-parts part="weather_icon" type="icon"></mz-weather-parts>
-      <mz-weather-parts part="temp" type="temperature"></mz-weather-parts>
-      <mz-weather-parts part="dt" type="time" timeformat="H a"></mz-weather-parts>
-    </div>
-  </mz-weather-hourly>
-  <mz-weather-daily>
-    <div class="container">
-      <mz-weather-parts part="dt" type="time" timeformat="EEEE"></mz-weather-parts>
-      <mz-weather-parts part="weather_icon" type="icon"></mz-weather-parts>
-      <mz-weather-parts part="pop" type="percent"></mz-weather-parts>
-      <mz-weather-parts part="temp_min" type="temperature"></mz-weather-parts>
-      <mz-weather-parts part="temp_max" type="temperature"></mz-weather-parts>
-    </div>
-  </mz-weather-daily>
-</div>
-`
-*/
-
-const defaultTemplate = `
-<style>
-:host {
-  position: relative;
-  display:flex;
-  flex-direction: column;
-  padding: 10px;
-  box-sizing: border-box;
-  width: 100%;
-}
-* {
-  box-sizing: border-box;
-}
-
-.current {
-  order: 1;
-}
-.today {
-  order: 2;
-}
-.hourly {
-  order: 3;
-}
-.daily {
-  order: 4;
-}
-
-</style>
-<mz-weather-section section="current"></mz-weather-section>
-<mz-weather-section section="today"></mz-weather-section>
-<mz-weather-section section="hourly" start="1"></mz-weather-section>
-<mz-weather-section section="daily" start="1"></mz-weather-section>
-
-`
-
 export default class extends CustomElement {
   get isShadow () {
     return true
-  }
-
-  defaultContent () {
-    return defaultTemplate.trim()
   }
 
   onConstructed () {

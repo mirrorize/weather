@@ -18,24 +18,9 @@ const flattenObject = (ob) => {
   return toReturn
 }
 
-const defaultTemplate = `
-<style>
-:host {
-  display:block;
-}
-</style>
-<slot name="pre"></slot>
-<span id="self"></span>
-<slot name="post"></slot>
-`
-
 export default class extends CustomElement {
   get isShadow () {
     return true
-  }
-
-  defaultContent () {
-    return defaultTemplate.trim()
   }
 
   onConstructed () {

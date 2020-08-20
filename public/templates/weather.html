@@ -1,0 +1,221 @@
+<template id="mz-weather">
+  <style>
+    :host {
+      position: relative;
+      display:flex;
+      flex-direction: column;
+      padding: 10px;
+      box-sizing: border-box;
+      width: 100%;
+    }
+    * {
+      box-sizing: border-box;
+    }
+    
+    .current {
+      order: 1;
+    }
+    .today {
+      order: 2;
+    }
+    .hourly {
+      order: 3;
+    }
+    .daily {
+      order: 4;
+    }
+    
+  </style>
+  <mz-weather-section section="current"></mz-weather-section>
+  <mz-weather-section section="today"></mz-weather-section>
+  <mz-weather-section section="hourly" start="1"></mz-weather-section>
+  <mz-weather-section section="daily" start="1"></mz-weather-section>
+</template>
+
+<template id="mz-weather-part">
+  <style>
+    :host {
+      display:block;
+    }
+  </style>
+  <slot name="pre"></slot>
+  <span id="self"></span>
+  <slot name="post"></slot>
+</template>
+
+<template id="mz-weather-section">
+  <style>
+    :host {
+      display: block;
+      box-sizing: border-box;
+      color: var(--font-color-second, #CCC);
+      --default-font-size: var(--font-base-size, 20px);
+      font-size: var(--default-font-size, 20px);
+      padding-bottom: 5px;
+    }
+    
+    :host([section=today]) {
+      --default-font-size: calc(var(--font-base-size, 20px) * 0.8);
+    }
+    
+    :host([section=hourly]) {
+      --default-font-size: calc(var(--font-base-size, 20px) * 0.8);
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+    }
+    
+    :host([section=daily]) {
+      --default-font-size: calc(var(--font-base-size, 20px) * 0.8);
+    }
+    
+    * {
+      box-sizing: border-box;
+    }
+    
+    .container {
+      display: flex;
+      justify-content: space-around;
+    }
+    
+    .ver {
+      flex-direction: column;
+    }
+    
+    .hor {
+      flex-direction: row;
+    }
+    
+    .center {
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+    }
+    
+    .title_section {
+      font-size: 1em;
+      align-items: center;
+    
+    }
+    
+    .title_section [part=title] {
+      font-weight:bolder;
+    }
+    
+    .title_section [part=dt] {
+      font-size: 0.8em;
+    }
+    
+    .emp {
+      font-size: 3em;
+      font-weight: bold;
+      margin-top: 0.5em;
+      justify-content: space-around;
+      color: var(--font-color-first, white);
+      line-height: 100%;
+    }
+    
+    .temp_min {
+      color: #2CF;
+    }
+    
+    .temp_max {
+      color: #FC2;
+    }
+    
+    .hourly_iteration {
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .hourly_iteration [part=temp] {
+      font-weight: bolder;
+    }
+    
+    .hourly_iteration [part="weather.icon"] {
+      font-size: 1.5em;
+      font-weight: bolder;
+    }
+    
+    .daily_iteration [part=dt] {
+      width: 35%;
+    }
+    
+    .daily_iteration [part="weather.icon"] {
+      width: 10%;
+      text-align: center;
+      font-weight: bolder;
+    }
+    .daily_iteration [part=pop] {
+      width: 15%;
+      text-align: right;
+      color: #33F;
+    }
+    .daily_iteration [part="temp.min"] {
+      width: 15%;
+      text-align: right;
+    }
+    .daily_iteration [part="temp.max"] {
+      width: 15%;
+      text-align: right;
+    }
+    
+  </style>
+</template>
+
+<template id="mz-weather-section-default-current">
+  <div class="container ver center title_section">
+    <mz-weather-part part="title" type="text"></mz-weather-part>
+    <mz-weather-part part="dt" type="time"></mz-weather-part>
+  </div>
+  <div class="container emp hor center">
+    <mz-weather-part part="weather.icon" type="icon"></mz-weather-part>
+    <mz-weather-part part="temp" type="temperature" fixup="0" displayunit></mz-weather-part>
+  </div>
+  <div class="container center">
+    <mz-weather-part part="weather.description" type="text"></mz-weather-part>
+  </div>
+</template>
+
+<template id="mz-weather-section-default-today">
+  <div class="container hor">
+    <mz-weather-part part="temp.min" type="temperature" class="temp_min">
+      <span slot="pre" class="iconify" data-icon="wi:direction-down"></span>
+      <span slot="post">°</span>
+    </mz-weather-part>
+    <mz-weather-part part="temp.max" type="temperature" class="temp_max">
+      <span slot="pre" class="iconify" data-icon="wi:direction-up"></span>
+      <span slot="post">°</span>
+    </mz-weather-part>
+    <mz-weather-part part="sunrise" type="time" timeformat="h:m a">
+      <span slot="pre" class="iconify" data-icon="wi:sunrise"></span>
+    </mz-weather-part>
+    <mz-weather-part part="sunset" type="time" timeformat="h:m a">
+      <span slot="pre" class="iconify" data-icon="wi:sunset"></span>
+    </mz-weather-part>
+  </div>
+</template>
+
+<template id="mz-weather-section-default-hourly">
+  <div class="container hourly_iteration ver">
+      <mz-weather-part part="temp" type="temperature">
+        <span slot="post">°</span>
+      </mz-weather-part>
+      <mz-weather-part part="weather.icon" type="icon"></mz-weather-part>
+      <mz-weather-part part="dt" type="time"></mz-weather-part>
+  </div>
+</template>
+
+<template id="mz-weather-section-default-daily">
+  <div class="container daily_iteration hor">
+    <mz-weather-part part="dt" type="time" timeformat="EEEE"></mz-weather-part>
+    <mz-weather-part part="weather.icon" type="icon"></mz-weather-part>
+    <mz-weather-part part="pop" type="ratio" displayunit></mz-weather-part>
+    <mz-weather-part part="temp.min" type="temperature" class="temp_min">
+      <span slot="post">°</span>
+    </mz-weather-part>
+    <mz-weather-part part="temp.max" type="temperature" class="temp_max">
+      <span slot="post">°</span>
+    </mz-weather-part>
+  </div>
+</template>
